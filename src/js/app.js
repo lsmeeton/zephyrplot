@@ -5,7 +5,7 @@ var zp = new zephyrplot("div.plot");
 var params = {
     info : {
         title : "ZephyrPlot",
-        n_trails : 16,
+        n_trails : 2,
         persist : true,
         xaxis : {
             min : 0,

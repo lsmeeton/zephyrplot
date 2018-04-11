@@ -77,12 +77,16 @@ var _createSVG = function(view, el) {
     if (!el)
         return;
 
-    return el.append("svg")
+    if (!this.svg) {
+        this.svg = el.append("svg")
              .attr("width", view.width)
-             .attr("height", view.height);
+                     .attr("height", view.height)
 }
 
-var _create_frequency_trail = function(info, view, data) {
+    return ;
+}
+
+var _create_frequency_trail = function(info, view, data, index) {
     // Create scales (again...)
 
     // Create xaxis scale
@@ -90,11 +94,13 @@ var _create_frequency_trail = function(info, view, data) {
     .domain([info.xaxis.min,info.xaxis.max])
     .range([view.padding, view.width - view.padding * 2])
     .nice();
-    
+    var y_range_min = (view.height - view.padding) * (index / info.n_trails);//(view.height * index / info.n_trails) - view.padding;
+    var y_range_max = view.padding * (1 - (index / info.n_trails));// index;//view.padding * 100;
+    console.log(info.n_trails,y_range_min, y_range_max);
     // Create yaxis scale
     var y_scale = d3.scaleLinear()
         .domain([info.yaxis.min,info.yaxis.max])
-        .range([((view.height - view.padding) / info.n_trails), view.padding])
+        .range([y_range_min, y_range_max])
         .nice();
 
     //Define line generator
@@ -114,17 +120,17 @@ var init = function(el) {
 
     var zephyrplot = function(params) {
         this.params = _default_params;
-        if (params && typeof(params) !== "object") {
-            _.extend(this.params.info, params.info, _default_params.info);
-            _.extend(this.params.view, params.view, _default_params.view);
+        if (params && typeof(params) === "object") {
+            _.extend(this.params.info, _default_params.info, params.info );
+            _.extend(this.params.view, _default_params.view, params.view);
         }
 
 
-        this.svg = _createSVG(this.params.view, plt);
+        _createSVG(this.params.view, plt);
         
         if (params && params.data) {
             // Concentrate on plotting a single line first...
-            var ft = _create_frequency_trail(this.params.info, this.params.view, params.data);
+            var ft = _create_frequency_trail(this.params.info, this.params.view, params.data, _index);
             this.svg.append("path")
                     .datum(params.data)
                     .attr("class", "line line_index" + _index)
